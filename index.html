@@ -356,8 +356,20 @@
 
   <div id="mainContent" class="main-content">
     <div class="header">
-      <h2>🌤️ Smart Jemuran </h2>
-    </div>
+  <h2>🌤️ Smart Jemuran </h2>
+  <button onclick="logout()" style="
+    position:absolute;
+    top:20px;
+    right:20px;
+    padding:10px 15px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+  ">
+    Logout
+  </button>
+</div>
+
 
     <div class="weather-section">
       <div class="weather-card">
@@ -407,23 +419,67 @@
     </div>
   </div>
 
+  <div id="authBox" style="
+  max-width:400px;
+  margin:100px auto;
+  text-align:center;
+  background: rgba(255,255,255,0.1);
+  padding:30px;
+  border-radius:20px;
+  backdrop-filter: blur(15px);
+">
+  <h2 style="margin-bottom:20px;">🔐 Login Smart Jemuran</h2>
+
+  <input id="email" type="email" placeholder="Email"
+    style="width:100%;padding:12px;margin-bottom:10px;border-radius:10px;border:none;">
+
+  <input id="password" type="password" placeholder="Password"
+    style="width:100%;padding:12px;margin-bottom:15px;border-radius:10px;border:none;">
+
+  <button onclick="submitAuth()" style="width:100%;margin-bottom:10px;">
+  Login
+  </button>
+
+
+  <p id="authMsg" style="margin-top:15px;color:#ffd;"></p>
+  <p style="margin-top:15px;font-size:14px;opacity:0.9;">
+  Belum punya akun?
+  <span onclick="showSignup()" style="color:#ffd700;cursor:pointer;">
+    Daftar di sini
+  </span>
+</p>
+
+<p style="margin-top:10px;font-size:14px;opacity:0.9;display:none;" id="loginInfo">
+  Sudah punya akun?
+  <span onclick="showLogin()" style="color:#7bed9f;cursor:pointer;">
+    Login di sini
+  </span>
+</p>
+
+</div>
+
+
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
 
   <script>
     // Splash Screen Logic
     window.addEventListener('load', function() {
-      setTimeout(function() {
-        const splash = document.getElementById('splashScreen');
-        const main = document.getElementById('mainContent');
-        
-        splash.style.opacity = '0';
-        setTimeout(function() {
-          splash.style.display = 'none';
-          main.classList.add('show');
-        }, 1000);
-      }, 3000); // 3 seconds delay
-    });
+  const splash = document.getElementById('splashScreen');
+
+  setTimeout(function() {
+    splash.style.opacity = '0';
+
+    setTimeout(function() {
+      splash.style.display = 'none';
+      cekLogin(); // ⬅️ BARU CEK LOGIN
+    }, 1000);
+
+  }, 2500);
+});
+
 
     var firebaseConfig = {
       apiKey: "AIzaSyADlqwRtUU_PsO8JhwL_VdGhpgD49pIfTY",
@@ -488,6 +544,69 @@
     function keluar() {
       db.ref("jemuran").update({ posisi: "keluar" });
     }
+    var auth = firebase.auth();
+
+// LOGIN
+
+
+// CEK STATUS LOGIN
+function cekLogin() {
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      document.getElementById("authBox").style.display = "none";
+      document.getElementById("mainContent").style.display = "block";
+      document.getElementById("mainContent").classList.add("show");
+    } else {
+      document.getElementById("authBox").style.display = "block";
+      document.getElementById("mainContent").style.display = "none";
+    }
+  });
+}
+
+let modeAuth = "login";
+
+function showSignup() {
+  modeAuth = "signup";
+  document.querySelector("#authBox h2").innerText = "📝 Daftar Akun Smart Jemuran";
+  document.getElementById("loginInfo").style.display = "block";
+}
+
+function showLogin() {
+  modeAuth = "login";
+  document.querySelector("#authBox h2").innerText = "🔐 Login Smart Jemuran";
+  document.getElementById("loginInfo").style.display = "none";
+}
+
+function submitAuth() {
+  var email = document.getElementById("email").value;
+  var password = document.getElementById("password").value;
+
+  if (modeAuth === "login") {
+    auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById("authMsg").innerText = "Login berhasil";
+      })
+      .catch(err => {
+        document.getElementById("authMsg").innerText = err.message;
+      });
+  } else {
+    auth.createUserWithEmailAndPassword(email, password)
+      .then(() => {
+        document.getElementById("authMsg").innerText =
+          "Akun berhasil dibuat. Bisa Login";
+        showLogin(); // ⬅️ balik ke login
+      })
+      .catch(err => {
+        document.getElementById("authMsg").innerText = err.message;
+      });
+  }
+}
+
+
+function logout() {
+  auth.signOut();
+}
+
   </script>
 </body>
 </html>
