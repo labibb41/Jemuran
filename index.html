@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Dashboard Jemuran</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: rgba(51,51,102);
+      min-height: 100vh;
+      padding: 20px 15px;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+
+    .splash-content {
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .splash-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+
+    .splash-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: fadeIn 1s ease-in;
+    }
+
+    .splash-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      animation: fadeIn 1s ease-in 0.5s both;
+    }
+
+    .main-content {
+      opacity: 0;
+      transition: opacity 1s ease-in;
+    }
+
+    .main-content.show {
+      opacity: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      letter-spacing: -0.5px;
+    }
+
+    .weather-section {
+      margin-bottom: 40px;
+    }
+
+    .weather-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 40px 30px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.2rem;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      color: #74b9ff;
+      border-color: rgba(116, 185, 255, 0.5);
+    }
+
+    .weather-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .weather-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .weather-card:hover::before {
+      left: 100%;
+    }
+
+    .weather-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .weather-details {
+      font-size: 1rem;
+      margin-top: 10px;
+      opacity: 0.9;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 30px 25px;
+      border-radius: 20px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .card:hover::before {
+      left: 100%;
+    }
+
+    .auto { 
+      color: #ff6b6b;
+      border-color: rgba(255, 107, 107, 0.5);
+    }
+    .manual { 
+      color: #4ecdc4;
+      border-color: rgba(78, 205, 196, 0.5);
+    }
+    .masuk { 
+      color: #ff7675;
+      border-color: rgba(255, 118, 117, 0.5);
+    }
+    .keluar { 
+      color: #74b9ff;
+      border-color: rgba(116, 185, 255, 0.5);
+    }
+    .hujan { 
+      color: #a29bfe;
+      border-color: rgba(162, 155, 254, 0.5);
+    }
+    .cerah { 
+      color: #fdcb6e;
+      border-color: rgba(253, 203, 110, 0.5);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .mode-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    .position-group {
+      display: flex;
+      gap: 15px;
+    }
+
+    button {
+      flex: 1;
+      padding: 18px 25px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    }
+
+    button:hover:not(:disabled)::before {
+      left: 100%;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      transform: none !important;
+    }
+
+    button:disabled:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    @media (min-width: 480px) {
+      .status-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      
+      .controls {
+        max-width: 500px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 40px;
+      }
+      
+      h2 {
+        font-size: 2.5rem;
+      }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(255,255,255,0.4);
+      }
+      70% { 
+        box-shadow: 0 0 0 15px rgba(255,255,255,0);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-30px);
+      }
+      60% {
+        transform: translateY(-15px);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Additional modern touches */
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .btn-icon {
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-icon">🌤️</div>
+      <div class="splash-title">Smart Jemuran</div>
+      <div class="splash-subtitle">Memuat sistem...</div>
+    </div>
+  </div>
+
+  <div id="mainContent" class="main-content">
+    <div class="header">
+      <h2>🌤️ Smart Jemuran </h2>
+    </div>
+
+    <div class="weather-section">
+      <div class="weather-card">
+        <span class="weather-icon">☁️</span>
+        Prakiraan Cuaca Hari Ini - Kota Gresik
+        <div class="weather-details">
+          Berawan<br>
+          Suhu: 28°C<br>
+          Kelembaban: 75%<br>
+          Angin: 10 km/h
+        </div>
+      </div>
+    </div>
+
+    <div class="status-grid">
+      <div id="modeNotif" class="card">
+        <span class="card-icon">⚙️</span>
+        Mode: -
+      </div>
+      <div id="hujanNotif" class="card">
+        <span class="card-icon">🌧️</span>
+        Status Cuaca: -
+      </div>
+      <div id="posisiNotif" class="card">
+        <span class="card-icon">🏠</span>
+        Posisi Jemuran: -
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="mode-group">
+        <button onclick="setMode('manual')" class="btn-mode">
+          <span class="btn-icon">🖐️</span>Manual
+        </button>
+        <button onclick="setMode('auto')" class="btn-mode">
+          <span class="btn-icon">🤖</span>Auto
+        </button>
+      </div>
+      <div class="position-group">
+        <button id="btnMasuk" onclick="masuk()" class="btn-position">
+          <span class="btn-icon">⬅️</span>Masuk
+        </button>
+        <button id="btnKeluar" onclick="keluar()" class="btn-position">
+          <span class="btn-icon">➡️</span>Keluar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+  <script>
+    // Splash Screen Logic
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const splash = document.getElementById('splashScreen');
+        const main = document.getElementById('mainContent');
+        
+        splash.style.opacity = '0';
+        setTimeout(function() {
+          splash.style.display = 'none';
+          main.classList.add('show');
+        }, 1000);
+      }, 3000); // 3 seconds delay
+    });
+
+    var firebaseConfig = {
+      apiKey: "AIzaSyADlqwRtUU_PsO8JhwL_VdGhpgD49pIfTY",
+      authDomain: "jemuran-ea306.firebaseapp.com",
+      databaseURL: "https://jemuran-ea306-default-rtdb.firebaseio.com",
+      projectId: "jemuran-ea306",
+      storageBucket: "jemuran-ea306.appspot.com",
+      messagingSenderId: "675867268685",
+      appId: "1:675867268685:web:804b5c4d70a8c8e6b9ee04"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+
+    db.ref("jemuran").on("value", function(snapshot) {
+      var data = snapshot.val();
+
+      // MODE
+      var modeBox = document.getElementById("modeNotif");
+      if (data.mode === "auto") {
+        modeBox.innerHTML = "<span class='card-icon'>🤖</span>🟠 MODE AUTO AKTIF";
+        modeBox.className = "card auto pulse";
+      } else {
+        modeBox.innerHTML = "<span class='card-icon'>🖐️</span>🟢 MODE MANUAL AKTIF";
+        modeBox.className = "card manual";
+      }
+
+      // HUJAN
+      var hujanBox = document.getElementById("hujanNotif");
+      if (data.hujan === true) {
+        hujanBox.innerHTML = "<span class='card-icon'>🌧️</span>🌧️ HUJAN TERDETEKSI";
+        hujanBox.className = "card hujan pulse";
+      } else {
+        hujanBox.innerHTML = "<span class='card-icon'>☀️</span>☀️ TIDAK HUJAN";
+        hujanBox.className = "card cerah";
+      }
+
+      // POSISI
+      var posisiBox = document.getElementById("posisiNotif");
+      if (data.posisi === "masuk") {
+        posisiBox.innerHTML = "<span class='card-icon'>🏠</span>🔴 JEMURAN MASUK";
+        posisiBox.className = "card masuk";
+      } else {
+        posisiBox.innerHTML = "<span class='card-icon'>🌞</span>🟢 JEMURAN KELUAR";
+        posisiBox.className = "card keluar";
+      }
+
+      // tombol manual disable saat auto
+      var disable = data.mode === "auto";
+      document.getElementById("btnMasuk").disabled = disable;
+      document.getElementById("btnKeluar").disabled = disable;
+    });
+
+    function setMode(mode) {
+      db.ref("jemuran").update({ mode: mode });
+    }
+
+    function masuk() {
+      db.ref("jemuran").update({ posisi: "masuk" });
+    }
+
+    function keluar() {
+      db.ref("jemuran").update({ posisi: "keluar" });
+    }
+  </script>
+</body>
+</html>
